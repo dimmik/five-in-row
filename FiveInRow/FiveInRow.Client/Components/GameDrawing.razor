@@ -1,0 +1,24 @@
+﻿<h3>GameDrawing</h3>
+
+<GameField 
+    dimension=@dim 
+    cellLen="20" 
+    game=@game
+    onFieldClick=@onClick
+    />
+
+@code {
+    public int dim = 20;
+    public FiveInRowGame game = new();
+
+    protected override void OnInitialized()
+    {
+        game.AddMove(0, 0);
+        game.AddMove(-1, 1);
+    }
+    private void onClick(int x, int y)
+    {
+        game.AddMove(x, y);
+    }
+
+}

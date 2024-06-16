@@ -1,0 +1,100 @@
+﻿<svg width=@(size + 4) height=@(size + 4) onmouseover=@(onMouseOver) onclick=@onClick>
+@for (int i = 0; i <= dimension; i++)
+{
+    int xHor = i * cellLen;
+    int yVer = i * cellLen;
+    <g>
+        <line x1=@xHor y1=0 x2=@xHor y2=@size stroke="black" />
+        <line x1=0 y1=@yVer x2=@size y2=@yVer stroke="black" />
+    </g>
+}
+    <!--highlight a cell-->
+    @if (xH >= 0 && yH >= 0)
+    {
+        var upperLeft = $"{xH * cellLen + 1}, {yH * cellLen + 1}";
+        var upperRight = $"{(xH+1) * cellLen - 1}, {yH * cellLen + 1}";
+        var downRight = $"{(xH + 1) * cellLen - 1}, {(yH + 1) * cellLen - 1}";
+        var downLeft = $"{xH * cellLen + 1}, {(yH + 1) * cellLen - 1}";
+        <polygon points="@upperLeft @upperRight @downRight @downLeft" fill="yellow"></polygon>
+    }
+    <!--Draw a game-->
+    @foreach (var m in game.Moves)
+    {
+        int x = (m.X + centerCell.x) * cellLen + cellLen / 2;
+        int y = (m.Y + centerCell.y) * cellLen + cellLen / 2;
+        if (m.Mover == Mover.X)
+        {
+            <XDraw x="x" y="y" size="@(cellLen - 8)"/>
+        } else
+        {
+            <ODraw x="x" y="y" size="@(cellLen - 8)" />
+        }
+    }
+</svg>
+
+
+@code {
+    [Parameter]
+    public int dimension { get; set; } = 20;
+
+    [Parameter]
+    public int cellLen { get; set; } = 10;
+
+    [Parameter]
+    public FiveInRowGame game { get; set; } = new();
+
+    [Parameter]
+    public Action<int, int> onFieldClick { get; set; } = (x, y) => { };
+
+    int size = 100;
+    int xH = -1;
+    int yH = -1;
+    (int x, int y) centerCell = (0, 0);
+
+    protected override void OnParametersSet()
+    {
+        if (game.Moves.Any()){
+            var maxCoord = game.Moves.Select(m => Math.Max(Math.Abs(m.X), Math.Abs(m.Y))).Max();
+            if (maxCoord > dimension / 2 + 1)
+                dimension = (maxCoord + 1) * 2;
+        }
+        init();
+
+    }
+    private void init()
+    {
+        size = cellLen * dimension;
+        centerCell = (dimension / 2, dimension / 2);
+    }
+    private void recalcDimension()
+    {
+        if (game.Moves.Any())
+        {
+            var maxCoord = game.Moves.Select(m => Math.Max(Math.Abs(m.X), Math.Abs(m.Y))).Max();
+            if (maxCoord >= dimension / 2 - 1){
+                dimension += 2;
+                init();
+            }
+        }
+
+    }
+
+    private Task onMouseOver(MouseEventArgs e)
+    {
+        var x = (int)e.OffsetX;
+        var y = (int)e.OffsetY;
+        xH = x / cellLen;
+        yH = y / cellLen;
+        return Task.CompletedTask;
+    }
+    private Task onClick(MouseEventArgs e)
+    {
+        var x = (int)e.OffsetX;
+        var y = (int)e.OffsetY;
+        xH = x / cellLen - centerCell.x;
+        yH = y / cellLen - centerCell.y;
+        onFieldClick(xH, yH);
+        recalcDimension();
+        return Task.CompletedTask;
+    }
+}
