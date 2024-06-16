@@ -2,6 +2,7 @@ using FiveInRow.Client.Pages;
 using FiveInRow.Components;
 using FiveInRow.Components.Account;
 using FiveInRow.Data;
+using FiveInRow.Hubs;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -42,6 +43,10 @@ namespace FiveInRow
                 .AddDefaultTokenProviders();
 
             builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
+            // SignalR
+            builder.Services.AddSignalR();
+
+            
 
             var app = builder.Build();
 
@@ -63,12 +68,16 @@ namespace FiveInRow
             app.UseStaticFiles();
             app.UseAntiforgery();
 
+
+
             app.MapRazorComponents<App>()
                 .AddInteractiveWebAssemblyRenderMode()
                 .AddAdditionalAssemblies(typeof(Counter).Assembly);
 
             // Add additional endpoints required by the Identity /Account Razor components.
             app.MapAdditionalIdentityEndpoints();
+
+            app.MapHub<GameHub>("/gamehub");
 
             app.Run();
         }

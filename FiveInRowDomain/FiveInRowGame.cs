@@ -18,8 +18,18 @@ namespace FiveInRowDomain
 
         public FiveInRowGame()
         {
+            init();
+        }
+        private void init()
+        {
+            Winner = null;
             Moves = new List<Move>();
             AddMove(0, 0);
+        }
+
+        public void Reset()
+        {
+            init();
         }
 
         public bool AddMove(int x, int y)
