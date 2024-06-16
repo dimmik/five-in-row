@@ -72,7 +72,7 @@
         {
             var maxCoord = game.Moves.Select(m => Math.Max(Math.Abs(m.X), Math.Abs(m.Y))).Max();
             if (maxCoord >= dimension / 2 - 1){
-                dimension += 2;
+                dimension += 6;
                 init();
             }
         }
@@ -91,10 +91,14 @@
     {
         var x = (int)e.OffsetX;
         var y = (int)e.OffsetY;
-        xH = x / cellLen - centerCell.x;
-        yH = y / cellLen - centerCell.y;
+        var xC = x / cellLen;
+        var yC = y / cellLen;
+        xH = xC - centerCell.x;
+        yH = yC - centerCell.y;
         onFieldClick(xH, yH);
-        recalcDimension();
+        if (xC == 0 || yC == 0 || xC == dimension - 1 || yC == dimension - 1){
+            recalcDimension();
+        }
         return Task.CompletedTask;
     }
 }
