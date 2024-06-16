@@ -34,6 +34,7 @@
                 cellLen="20" 
                 game=@game.Game
                 onFieldClick=@onClick
+                allowedMover=@game.GetMover(p)
             />
         }
         <span>
@@ -89,6 +90,12 @@
             StateHasChanged();
         });
 
+        hubConnection.On<FiveInRowMultiplayer>("GameMove", g =>
+        {
+            game = g;
+            StateHasChanged();
+        });
+
         await hubConnection.StartAsync();
     }
 
@@ -104,13 +111,16 @@
 
     private string cursor()
     {
-        if (game.Game.NextMover == Mover.X)
+        if (game.Game.NextMover == Mover.X && game.GetMover(p) == game.Game.NextMover)
         {
             return @"url('/X.png')";
         }
-        else
+        else if (game.Game.NextMover == Mover.O && game.GetMover(p) == game.Game.NextMover)
         {
             return @"url('/O.png')";
+        } else
+        {
+            return "not-allowed";
         }
     }
 

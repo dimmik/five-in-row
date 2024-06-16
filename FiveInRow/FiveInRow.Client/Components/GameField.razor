@@ -1,6 +1,6 @@
 ﻿<svg width=@(size + 4) height=@(size + 4) onmouseover=@onMouseOver onclick=@onClick>
     <style>
-        svg {cursor: @cursor(), auto;}
+        svg {cursor: @cursor();}
     </style>
 @for (int i = 0; i <= dimension; i++)
 {
@@ -47,6 +47,9 @@
     public FiveInRowGame game { get; set; } = new();
 
     [Parameter]
+    public Mover? allowedMover { get; set; } = null;
+
+    [Parameter]
     public Func<int, int, Task> onFieldClick { get; set; } = (x, y) => { return Task.CompletedTask; };
 
     int size = 100;
@@ -56,12 +59,16 @@
 
     private string cursor()
     {
-        if (game.NextMover == Mover.X)
+        if (game.NextMover == Mover.X && (allowedMover == null || allowedMover == Mover.X))
         {
-            return @"url('/X.png') 9 9";
+            return @"url('/X.png') 9 9, auto";
+        }
+        else if (game.NextMover == Mover.O && (allowedMover == null || allowedMover == Mover.O))
+        {
+            return @"url('/O.png') 9 9, auto";
         } else
         {
-            return @"url('/O.png') 9 9";
+            return "not-allowed";
         }
     }
 
