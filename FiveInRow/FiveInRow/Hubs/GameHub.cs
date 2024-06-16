@@ -19,6 +19,9 @@ namespace FiveInRow.Hubs
             if (mover == Mover.X)
             {
                 game.X = new Player(userId);
+            } else
+            {
+                game.O = new Player(userId);
             }
             games[game.Id] = game;
             await Groups.AddToGroupAsync(Context.ConnectionId, game.Id);
@@ -63,6 +66,7 @@ namespace FiveInRow.Hubs
             string err = game.AddMove(new Player(userId), x, y);
             if (err == "")
             {
+                _ = game.Game.WhoWon();
                 await Clients.Group(game.Id).SendAsync("GameMove", game);
             } else
             {

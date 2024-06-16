@@ -47,7 +47,7 @@
     public FiveInRowGame game { get; set; } = new();
 
     [Parameter]
-    public Mover? allowedMover { get; set; } = null;
+    public List<Mover> allowedMovers { get; set; } = new() { Mover.X, Mover.O };
 
     [Parameter]
     public Func<int, int, Task> onFieldClick { get; set; } = (x, y) => { return Task.CompletedTask; };
@@ -59,11 +59,11 @@
 
     private string cursor()
     {
-        if (game.NextMover == Mover.X && (allowedMover == null || allowedMover == Mover.X))
+        if (game.NextMover == Mover.X && allowedMovers.Contains(Mover.X))
         {
             return @"url('/X.png') 9 9, auto";
         }
-        else if (game.NextMover == Mover.O && (allowedMover == null || allowedMover == Mover.O))
+        else if (game.NextMover == Mover.O && allowedMovers.Contains(Mover.O))
         {
             return @"url('/O.png') 9 9, auto";
         } else
@@ -103,7 +103,8 @@
 
     private Task onMouseOver(MouseEventArgs e)
     {
-        if (!game.IsActive()){
+        var allowed = allowedMovers.Contains(game.NextMover);
+        if (!game.IsActive() || !allowed){
             xH = yH = -1;
             return Task.CompletedTask;
         }

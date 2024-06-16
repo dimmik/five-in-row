@@ -8,11 +8,11 @@ namespace FiveInRowDomain
 {
     public class FiveInRowGame
     {
-        public IList<Move> Moves { get; private set; } = new List<Move>();
-        public Mover NextMover { get; private set; } = Mover.X;
+        public IList<Move> Moves { get;  set; } = new List<Move>();
+        public Mover NextMover { get;  set; } = Mover.X;
         private Dictionary<(int x, int y), Mover> moveDict = new();
 
-        public Mover? Winner { get; private set; } = null;
+        public Mover? Winner { get; set; } = null;
 
         public bool IsActive() => Winner == null;
 
@@ -23,7 +23,9 @@ namespace FiveInRowDomain
         private void init()
         {
             Winner = null;
+            moveDict.Clear();
             Moves = new List<Move>();
+            NextMover = Mover.X;
             AddMove(0, 0);
         }
 

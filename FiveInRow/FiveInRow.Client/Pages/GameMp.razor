@@ -34,7 +34,7 @@
                 cellLen="20" 
                 game=@game.Game
                 onFieldClick=@onClick
-                allowedMover=@game.GetMover(p)
+                allowedMovers=@alloweMovers()
             />
         }
         <span>
@@ -49,7 +49,7 @@
 </span>
 @if(game.Game.Winner != null)
 {
-    <div>@game.Game.Winner won!!! <button @onclick=@(() => game = new())>Refresh</button></div>
+    <div>@game.Game.Winner won!!! <button @onclick=@ResetGame>Refresh</button></div>
 }
 </div>
 
@@ -61,7 +61,7 @@
     public FiveInRowMultiplayer game = new();
 
     [Parameter]
-    public string gameToAccept { get; set; }
+    public string gameToAccept { get; set; } = "";
 
     bool gameAccepted = false;
     bool gameStarted = false;
@@ -99,37 +99,38 @@
         await hubConnection.StartAsync();
     }
 
-    private void CreateGame()
+    private List<Mover> alloweMovers()
     {
-        hubConnection.SendAsync("CreateGame", p.Id, Mover.O);
+        if (!game.Game.IsActive()) // no allowed movers
+            return new();
+        var m = game.GetMover(p);
+        if (m != null)
+            return new() { m.Value };
+        return new();
     }
 
-    private void AcceptGame()
+    private async Task CreateGame()
     {
-        hubConnection.SendAsync("AcceptGame", gameToAccept, p.Id);
+        await hubConnection.SendAsync("CreateGame", p.Id, Mover.O);
     }
 
-    private string cursor()
+
+    private async Task AcceptGame()
     {
-        if (game.Game.NextMover == Mover.X && game.GetMover(p) == game.Game.NextMover)
-        {
-            return @"url('/X.png')";
-        }
-        else if (game.Game.NextMover == Mover.O && game.GetMover(p) == game.Game.NextMover)
-        {
-            return @"url('/O.png')";
-        } else
-        {
-            return "not-allowed";
-        }
+        await hubConnection.SendAsync("AcceptGame", gameToAccept, p.Id);
     }
+
+    private async Task ResetGame()
+    {
+        await hubConnection.SendAsync("Reset", game.Id);
+    }
+
 
     private async Task onClick(int x, int y)
     {
         if (game.Game.Winner == null && game.GetMover(p) == game.Game.NextMover)
         {
-            //hubConnection.
-            // send move
+            await hubConnection.SendAsync("Move", game.Id, p.Id, x, y);
         }
 
     }

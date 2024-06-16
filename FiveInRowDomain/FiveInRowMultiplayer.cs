@@ -10,7 +10,7 @@ namespace FiveInRowDomain
     {
         public string Id { get; set; } = Guid.NewGuid().ToString();
 
-        public FiveInRowGame Game { get; private set; } = new();
+        public FiveInRowGame Game { get; set; } = new();
         public Player? X { get; set; } = null;
         public Player? O { get; set; } = null;
         public Mover? GetMover(Player p)
