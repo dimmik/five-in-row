@@ -1,0 +1,134 @@
+﻿@page "/play/{gameToAccept}"
+@page "/play"
+@using Microsoft.AspNetCore.SignalR.Client
+@inject NavigationManager NavigationManager
+@implements IAsyncDisposable
+
+@rendermode InteractiveWebAssembly
+<div style="display: flex; flex-direction: column; align-items: center;">
+<h3>Five In a Row</h3>
+<span style="display: flex; justify-content: center">
+        @if (string.IsNullOrWhiteSpace(gameToAccept))
+        {
+            <button @onclick=@(() => CreateGame())>Create Game</button>
+            @if (newGameCreated)
+            {
+                <a href="/play/@(game.Id)">link to accept</a>
+            }
+        } else
+        {
+            if (!gameAccepted)
+            {
+                <button @onclick=@(() => AcceptGame())>Accept Game</button>
+            } else
+            {
+                <span>Game Accepted</span>
+            }
+
+        }
+
+        @if (gameStarted)
+        {
+            <GameField 
+               dimension=@dim 
+                cellLen="20" 
+                game=@game.Game
+                onFieldClick=@onClick
+            />
+        }
+        <span>
+        Moves:
+        <ol>
+                @foreach(var m in game.Game.Moves)
+                {
+                    <li>@m.Mover: @m.X @m.Y</li>
+                }
+        </ol>
+    </span>
+</span>
+@if(game.Game.Winner != null)
+{
+    <div>@game.Game.Winner won!!! <button @onclick=@(() => game = new())>Refresh</button></div>
+}
+</div>
+
+@code {
+
+    private HubConnection hubConnection;
+
+    public int dim = 30;
+    public FiveInRowMultiplayer game = new();
+
+    [Parameter]
+    public string gameToAccept { get; set; }
+
+    bool gameAccepted = false;
+    bool gameStarted = false;
+
+    Player p = new Player();
+    bool newGameCreated = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(NavigationManager.ToAbsoluteUri("/gamehub"))
+            .Build();
+
+        hubConnection.On<FiveInRowMultiplayer>("GameCreated", (g) =>
+        {
+            game = g;
+            newGameCreated = true;
+            StateHasChanged();
+        });
+
+        hubConnection.On<FiveInRowMultiplayer>("GameStarted", g =>
+        {
+            gameAccepted = true;
+            game = g;
+            gameStarted = true;
+            StateHasChanged();
+        });
+
+        await hubConnection.StartAsync();
+    }
+
+    private void CreateGame()
+    {
+        hubConnection.SendAsync("CreateGame", p.Id, Mover.O);
+    }
+
+    private void AcceptGame()
+    {
+        hubConnection.SendAsync("AcceptGame", gameToAccept, p.Id);
+    }
+
+    private string cursor()
+    {
+        if (game.Game.NextMover == Mover.X)
+        {
+            return @"url('/X.png')";
+        }
+        else
+        {
+            return @"url('/O.png')";
+        }
+    }
+
+    private async Task onClick(int x, int y)
+    {
+        if (game.Game.Winner == null && game.GetMover(p) == game.Game.NextMover)
+        {
+            //hubConnection.
+            // send move
+        }
+
+    }
+    public async ValueTask DisposeAsync()
+    {
+        if (hubConnection is not null)
+        {
+            await hubConnection.DisposeAsync();
+        }
+    }
+
+}

@@ -44,7 +44,9 @@ namespace FiveInRow
 
             builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
             // SignalR
+            builder.Services.AddSingleton(new GStorage());
             builder.Services.AddSignalR();
+
 
             
 

@@ -47,7 +47,7 @@
     public FiveInRowGame game { get; set; } = new();
 
     [Parameter]
-    public Action<int, int> onFieldClick { get; set; } = (x, y) => { };
+    public Func<int, int, Task> onFieldClick { get; set; } = (x, y) => { return Task.CompletedTask; };
 
     int size = 100;
     int xH = -1;

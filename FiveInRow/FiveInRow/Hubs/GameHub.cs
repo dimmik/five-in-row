@@ -8,6 +8,11 @@ namespace FiveInRow.Hubs
     {
         private Dictionary<string, FiveInRowMultiplayer> games = new();
 
+        public GameHub(GStorage storage) 
+        {
+            games = storage.games;
+        }
+
         public async Task CreateGame(string userId, Mover mover)
         {
             var game = new FiveInRowMultiplayer();
@@ -84,5 +89,9 @@ namespace FiveInRow.Hubs
 
             await Clients.Group(gameId).SendAsync("GameStarted", game);
         }
+    }
+    public class GStorage
+    {
+        public Dictionary<string, FiveInRowMultiplayer> games = new();
     }
 }

@@ -8,11 +8,17 @@ namespace FiveInRowDomain
 {
     public class FiveInRowMultiplayer
     {
-        public string Id { get; private set; } = Guid.NewGuid().ToString();
+        public string Id { get; set; } = Guid.NewGuid().ToString();
 
         public FiveInRowGame Game { get; private set; } = new();
         public Player? X { get; set; } = null;
         public Player? O { get; set; } = null;
+        public Mover? GetMover(Player p)
+        {
+            if (X == p) return Mover.X;
+            if (O == p) return Mover.O;
+            return null;
+        }
         public string AddMove(Player p, int x, int y)
         {
             Mover m;
@@ -42,6 +48,10 @@ namespace FiveInRowDomain
         public Player(string id)
         {
             Id = id ?? throw new ArgumentNullException(nameof(id));
+        }
+        public Player()
+        {
+            // nothing - id is random Guid
         }
 
         public override bool Equals(object? obj)

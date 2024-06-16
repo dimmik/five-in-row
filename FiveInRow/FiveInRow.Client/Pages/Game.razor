@@ -43,7 +43,7 @@
         }
     }
 
-    private void onClick(int x, int y)
+    private Task onClick(int x, int y)
     {
         if (game.Winner == null)
         {
@@ -55,6 +55,7 @@
                 StateHasChanged();
             }
         }
+        return Task.CompletedTask;
 
     }
 
