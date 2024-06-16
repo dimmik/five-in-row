@@ -3,12 +3,23 @@
 @rendermode InteractiveWebAssembly
 <div style="display: flex; flex-direction: column; align-items: center;">
 <h3>Five In a Row</h3>
+<span style="display: flex; justify-content: center">
 <GameField 
     dimension=@dim 
     cellLen="20" 
     game=@game
     onFieldClick=@onClick
     />
+    <span>
+        Moves:
+        <ol>
+                @foreach(var m in game.Moves)
+                {
+                    <li>@m.Mover: @m.X @m.Y</li>
+                }
+        </ol>
+    </span>
+</span>
 @if(game.Winner != null)
 {
     <div>@game.Winner won!!! <button @onclick=@(() => game = new())>Refresh</button></div>

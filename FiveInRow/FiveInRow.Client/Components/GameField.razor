@@ -112,9 +112,9 @@
         var y = (int)e.OffsetY;
         var xC = x / cellLen;
         var yC = y / cellLen;
-        xH = xC - centerCell.x;
-        yH = yC - centerCell.y;
-        onFieldClick(xH, yH);
+        var xcH = xC - centerCell.x;
+        var ycH = yC - centerCell.y;
+        onFieldClick(xcH, ycH);
         if (xC == 0 || yC == 0 || xC == dimension - 1 || yC == dimension - 1){
            // recalcDimension();
         }
