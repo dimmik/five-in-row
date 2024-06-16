@@ -9,8 +9,12 @@ namespace FiveInRowDomain
     public class FiveInRowGame
     {
         public IList<Move> Moves { get; private set; } = new List<Move>();
-        private Mover NextMover { get; set; } = Mover.X;
-        private Dictionary<(int x, int y), Mover> moveDict = new(); 
+        public Mover NextMover { get; private set; } = Mover.X;
+        private Dictionary<(int x, int y), Mover> moveDict = new();
+
+        public Mover? Winner { get; private set; } = null;
+
+        public bool IsActive() => Winner == null;
 
         public FiveInRowGame()
         {
@@ -31,6 +35,15 @@ namespace FiveInRowDomain
         }
 
         public Mover? WhoWon()
+        {
+            if (Winner == null)
+            {
+                Winner = CalculateWinner();
+            }
+            return Winner;
+        }
+
+        public Mover? CalculateWinner()
         {
             foreach (var move in Moves)
             {

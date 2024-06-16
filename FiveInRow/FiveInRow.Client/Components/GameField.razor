@@ -1,4 +1,7 @@
-﻿<svg width=@(size + 4) height=@(size + 4) onmouseover=@(onMouseOver) onclick=@onClick>
+﻿<svg width=@(size + 4) height=@(size + 4) onmouseover=@onMouseOver onclick=@onClick>
+    <style>
+        svg {cursor: @cursor(), auto;}
+    </style>
 @for (int i = 0; i <= dimension; i++)
 {
     int xHor = i * cellLen;
@@ -51,6 +54,17 @@
     int yH = -1;
     (int x, int y) centerCell = (0, 0);
 
+    private string cursor()
+    {
+        if (game.NextMover == Mover.X)
+        {
+            return @"url('/X.png') 9 9";
+        } else
+        {
+            return @"url('/O.png') 9 9";
+        }
+    }
+
     protected override void OnParametersSet()
     {
         if (game.Moves.Any()){
@@ -61,6 +75,7 @@
         init();
 
     }
+
     private void init()
     {
         size = cellLen * dimension;
@@ -81,6 +96,10 @@
 
     private Task onMouseOver(MouseEventArgs e)
     {
+        if (!game.IsActive()){
+            xH = yH = -1;
+            return Task.CompletedTask;
+        }
         var x = (int)e.OffsetX;
         var y = (int)e.OffsetY;
         xH = x / cellLen;
