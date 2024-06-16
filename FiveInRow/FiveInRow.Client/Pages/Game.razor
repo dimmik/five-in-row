@@ -1,5 +1,39 @@
 ﻿@page "/game"
 @rendermode InteractiveWebAssembly
-<h3>Game</h3>
+<h3>Five In a Row</h3>
+<GameField 
+    dimension=@dim 
+    cellLen="20" 
+    game=@game
+    onFieldClick=@onClick
+    />
+@if(winner != null)
+{
+    <div>@winner won!!!</div>
+}
 
-<GameDrawing/>
+@code {
+    public int dim = 30;
+    public FiveInRowGame game = new();
+
+    Mover? winner = null;
+
+    protected override void OnInitialized()
+    {
+
+    }
+    private void onClick(int x, int y)
+    {
+        if (winner == null)
+        {
+            bool correct = game.AddMove(x, y);
+            if (correct)
+            {
+                winner = game.WhoWon();
+                StateHasChanged();
+            }
+        }
+
+    }
+
+}

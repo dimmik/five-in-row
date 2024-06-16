@@ -11,6 +11,13 @@ namespace FiveInRowDomain
         public IList<Move> Moves { get; private set; } = new List<Move>();
         private Mover NextMover { get; set; } = Mover.X;
         private Dictionary<(int x, int y), Mover> moveDict = new(); 
+
+        public FiveInRowGame()
+        {
+            Moves = new List<Move>();
+            AddMove(0, 0);
+        }
+
         public bool AddMove(int x, int y)
         {
             var occupied = moveDict.ContainsKey((x, y));//Moves.Where(m => (m.X == x) && (m.Y == y)).Any();
