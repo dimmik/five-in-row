@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\FiveInRowDomain\FiveInRowDomain.csproj" />
+    <ProjectReference Include="..\FiveInRowDomain\FiveInRowDomain.csproj" />
   </ItemGroup>
 
 </Project>

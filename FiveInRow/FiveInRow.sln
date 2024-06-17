@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FiveInRow", "FiveInRow\Five
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FiveInRow.Client", "FiveInRow.Client\FiveInRow.Client.csproj", "{F5AD40D7-B5AB-4D6D-9DE4-67DDA51D0393}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FiveInRowDomain", "..\FiveInRowDomain\FiveInRowDomain.csproj", "{4057AB28-6B81-426F-886D-55177CF0513C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FiveInRowDomain", "FiveInRowDomain\FiveInRowDomain.csproj", "{4057AB28-6B81-426F-886D-55177CF0513C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
