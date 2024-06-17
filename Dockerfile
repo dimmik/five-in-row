@@ -2,6 +2,7 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 USER app
 WORKDIR /app
 ENV ASPNETCORE_URLS=http://*:5190
+ENV URLS=http://*:5190
 EXPOSE 80
 EXPOSE 443
 
