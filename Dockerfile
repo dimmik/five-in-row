@@ -12,14 +12,14 @@ WORKDIR /src
 COPY ["FiveInRow/FiveInRow.csproj", "FiveInRow/"]
 COPY ["FiveInRowDomain/FiveInRowDomain.csproj", "FiveInRowDomain/"]
 COPY ["FiveInRow.Client/FiveInRow.Client.csproj", "FiveInRow.Client/"]
-RUN dotnet restore /FiveInRow/FiveInRow.csproj
+RUN dotnet restore "FiveInRow/FiveInRow.csproj"
 COPY . .
 WORKDIR "/src/FiveInRow"
-RUN dotnet build "./FiveInRow.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet build "FiveInRow.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./FiveInRow.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "FiveInRow.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
