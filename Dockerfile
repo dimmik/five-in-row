@@ -12,7 +12,7 @@ WORKDIR /src
 COPY ["FiveInRow/FiveInRow.csproj", "FiveInRow/"]
 COPY ["FiveInRowDomain/FiveInRowDomain.csproj", "FiveInRowDomain/"]
 COPY ["FiveInRow.Client/FiveInRow.Client.csproj", "FiveInRow.Client/"]
-RUN dotnet restore "FiveInRow/FiveInRow.csproj"
+# RUN dotnet restore "FiveInRow/FiveInRow.csproj"
 COPY . .
 WORKDIR "/src/FiveInRow"
 RUN dotnet build "FiveInRow.csproj" -c $BUILD_CONFIGURATION -o /app/build
