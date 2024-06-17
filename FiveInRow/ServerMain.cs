@@ -4,7 +4,7 @@ using FiveInRow.Hubs;
 
 namespace FiveInRow
 {
-    public class Program
+    public class ServerMain
     {
         public static void Main(string[] args)
         {
