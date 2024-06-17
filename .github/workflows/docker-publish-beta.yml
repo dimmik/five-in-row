@@ -1,4 +1,4 @@
-name: 5 in row -- Create and publish a Docker image
+name: BETA 5 in row -- Create and publish a Docker image
 concurrency: 
   group: five-in-row
   cancel-in-progress: true
@@ -6,7 +6,7 @@ concurrency:
 on:
   push:
 # run from prod branch
-    branches: ['prod']
+    branches: ['beta/**']
 
 env:
   REGISTRY: ghcr.io
@@ -61,7 +61,7 @@ jobs:
           context: .
           file: Dockerfile
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest,${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:release-${{ steps.current-time.outputs.formattedTime }}
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:beta-latest,${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:beta-${{ steps.current-time.outputs.formattedTime }}
           build-args: |
              BUILD_TYPE=prodB (${{ steps.extract_branch.outputs.branch }})
              BUILD_PROPS=-p:RunAOTCompilation=true
