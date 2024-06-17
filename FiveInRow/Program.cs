@@ -1,11 +1,6 @@
 using FiveInRow.Client.Pages;
 using FiveInRow.Components;
-using FiveInRow.Components.Account;
-using FiveInRow.Data;
 using FiveInRow.Hubs;
-using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 
 namespace FiveInRow
 {
@@ -19,39 +14,21 @@ namespace FiveInRow
             builder.Services.AddRazorComponents()
                 .AddInteractiveWebAssemblyComponents();
 
-            builder.Services.AddCascadingAuthenticationState();
-            builder.Services.AddScoped<IdentityUserAccessor>();
-            builder.Services.AddScoped<IdentityRedirectManager>();
-            builder.Services.AddScoped<AuthenticationStateProvider, PersistingServerAuthenticationStateProvider>();
+            builder.Services.AddAntiforgery(options =>
+            {     // Set Cookie properties using CookieBuilder properties†.
 
-            builder.Services.AddAuthorization();
-            builder.Services.AddAuthentication(options =>
-                {
-                    options.DefaultScheme = IdentityConstants.ApplicationScheme;
-                    options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
-                })
-                .AddIdentityCookies();
+                options.Cookie.Expiration = TimeSpan.Zero;
 
-            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-            builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(connectionString));
-            builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-
-            builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
-                .AddEntityFrameworkStores<ApplicationDbContext>()
-                .AddSignInManager()
-                .AddDefaultTokenProviders();
-
-            builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
+            });
             // SignalR
             builder.Services.AddSingleton(new GStorage());
             builder.Services.AddSignalR();
 
 
+
             
 
             var app = builder.Build();
-
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
@@ -68,16 +45,12 @@ namespace FiveInRow
             app.UseHttpsRedirection();
 
             app.UseStaticFiles();
-            app.UseAntiforgery();
-
-
 
             app.MapRazorComponents<App>()
                 .AddInteractiveWebAssemblyRenderMode()
-                .AddAdditionalAssemblies(typeof(Counter).Assembly);
-
-            // Add additional endpoints required by the Identity /Account Razor components.
-            app.MapAdditionalIdentityEndpoints();
+                .AddAdditionalAssemblies(typeof(GameMp).Assembly)
+                .DisableAntiforgery()
+                ;
 
             app.MapHub<GameHub>("/gamehub");
 

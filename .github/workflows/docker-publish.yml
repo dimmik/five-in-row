@@ -6,7 +6,7 @@ concurrency:
 on:
   push:
 # run from prod branch
-    branches: ['prod']
+    branches: ['prod', 'beta/**']
 
 env:
   REGISTRY: ghcr.io
