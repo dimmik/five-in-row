@@ -61,7 +61,7 @@ jobs:
           context: .
           file: Dockerfile
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:blazor-latest,${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:blazor-${{ steps.current-time.outputs.formattedTime }}
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest,${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:release-${{ steps.current-time.outputs.formattedTime }}
           build-args: |
              BUILD_TYPE=prodB (${{ steps.extract_branch.outputs.branch }})
              BUILD_PROPS=-p:RunAOTCompilation=true
