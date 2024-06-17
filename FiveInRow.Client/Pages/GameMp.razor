@@ -1,6 +1,7 @@
 ﻿@page "/play/{gameToAccept}"
 @page "/play"
 @using Microsoft.AspNetCore.SignalR.Client
+@using System.Runtime.InteropServices
 @inject NavigationManager NavigationManager
 @implements IAsyncDisposable
 
@@ -71,6 +72,9 @@
 
     protected override async Task OnInitializedAsync()
     {
+        // awoid server-side trying to connect to hub
+        if (RuntimeInformation.ProcessArchitecture != Architecture.Wasm) return;
+
         hubConnection = new HubConnectionBuilder()
             .WithUrl(NavigationManager.ToAbsoluteUri("/gamehub"))
             .Build();
@@ -95,7 +99,7 @@
             game = g;
             StateHasChanged();
         });
-
+        
         await hubConnection.StartAsync();
     }
 
