@@ -6,18 +6,11 @@ WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
 
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0 AS publish
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["FiveInRow/FiveInRow.csproj", "FiveInRow/"]
-COPY ["FiveInRowDomain/FiveInRowDomain.csproj", "FiveInRowDomain/"]
-COPY ["FiveInRow.Client/FiveInRow.Client.csproj", "FiveInRow.Client/"]
-# RUN dotnet restore "FiveInRow/FiveInRow.csproj"
 COPY . .
 WORKDIR "/src/FiveInRow"
-RUN dotnet build "FiveInRow.csproj" -c $BUILD_CONFIGURATION -o /app/build
-
-FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "FiveInRow.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
