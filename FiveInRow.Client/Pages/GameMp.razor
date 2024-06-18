@@ -30,6 +30,7 @@
 
         @if (gameStarted)
         {
+            <table><tr><td>
             <GameField 
                dimension=@dim 
                 cellLen="20" 
@@ -37,15 +38,19 @@
                 onFieldClick=@onClick
                 allowedMovers=@alloweMovers()
             />
+            </td><td>
+                Moves:
+                <ol>
+                    @foreach (var m in game.Game.Moves)
+                    {
+                        <li>@m.Mover: @m.X @m.Y</li>
+                    }
+                </ol>
+                    </td>
+                </tr>
+            </table>
         }
         <span>
-        Moves:
-        <ol>
-                @foreach(var m in game.Game.Moves)
-                {
-                    <li>@m.Mover: @m.X @m.Y</li>
-                }
-        </ol>
     </span>
 </span>
 @if(game.Game.Winner != null)
@@ -71,6 +76,10 @@
     bool newGameCreated = false;
 
     protected override async Task OnInitializedAsync()
+    {
+        await initHub();
+    }
+    private async Task initHub()
     {
         // awoid server-side trying to connect to hub
         if (RuntimeInformation.ProcessArchitecture != Architecture.Wasm) return;
@@ -99,7 +108,7 @@
             game = g;
             StateHasChanged();
         });
-        
+
         await hubConnection.StartAsync();
     }
 
