@@ -8,7 +8,7 @@
 @rendermode InteractiveWebAssembly
 
 <div class="game-container">
-    <h1 class="game-title">Five In a Row</h1>
+    <h1 class="game-title">Five In a Row @(game.GetMover(p))</h1>
     <div class="game-status">
         @if (!gameStarted)
         {
@@ -51,24 +51,28 @@
 
     @if (gameStarted)
     {
-        <div class="game-board">
-            <GameField dimension=@dim
-                       cellLen="30"
-                       game=@game.Game
-                       onFieldClick=@onClick
-                       allowedMovers=@alloweMovers() />
-        </div>
-        <div class="game-info">
-            <h3>Moves History</h3>
-            <ol class="moves-list">
-                @foreach (var m in game.Game.Moves)
-                {
-                    <li>
-                        <span class="move-player">@m.Mover:</span>
-                        <span class="move-coords">(@m.X, @m.Y)</span>
-                    </li>
-                }
-            </ol>
+        <div class="game-layout">
+            <div class="game-board-container">
+                <div class="game-board">
+                    <GameField dimension=@dim
+                               cellLen="30"
+                               game=@game.Game
+                               onFieldClick=@onClick
+                               allowedMovers=@alloweMovers() />
+                </div>
+            </div>
+            <div class="game-info">
+                <h3>Moves History</h3>
+                <ol class="moves-list">
+                    @foreach (var m in game.Game.Moves)
+                    {
+                        <li>
+                            <span class="move-player">@m.Mover:</span>
+                            <span class="move-coords">(@m.X, @m.Y)</span>
+                        </li>
+                    }
+                </ol>
+            </div>
         </div>
     }
 
@@ -148,21 +152,35 @@
         font-weight: bold;
     }
 
-    .game-board {
+    .game-layout {
         display: flex;
-        justify-content: center;
-        margin-bottom: 20px;
+        gap: 20px;
     }
 
-    .game-info {
-        background-color: #f9f9f9;
-        padding: 15px;
+    .game-board-container {
+        flex: 1;
+        overflow: auto;
+        max-height: 500px;
+        border: 1px solid #ccc;
         border-radius: 5px;
     }
 
-    .moves-list {
-        max-height: 300px;
+    .game-board {
+        min-width: 100%;
+        min-height: 100%;
+    }
+
+    .game-info {
+        flex: 0 0 200px;
+        background-color: #f9f9f9;
+        padding: 15px;
+        border-radius: 5px;
+        max-height: 500px;
         overflow-y: auto;
+    }
+
+    .moves-list {
+        padding-left: 20px;
     }
 
         .moves-list li {
@@ -203,9 +221,9 @@
     {
         await initHub();
     }
+
     private async Task initHub()
     {
-        // avoid server-side trying to connect to hub
         if (RuntimeInformation.ProcessArchitecture != Architecture.Wasm) return;
 
         hubConnection = new HubConnectionBuilder()
@@ -238,8 +256,7 @@
 
     private List<Mover> alloweMovers()
     {
-        if (!game.Game.IsActive()) // no allowed movers
-            return new();
+        if (!game.Game.IsActive()) return new();
         var m = game.GetMover(p);
         if (m != null)
             return new() { m.Value };
