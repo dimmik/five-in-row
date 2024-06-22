@@ -3,6 +3,7 @@
 @using Microsoft.AspNetCore.SignalR.Client
 @using System.Runtime.InteropServices
 @inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
 @implements IAsyncDisposable
 
 @rendermode InteractiveWebAssembly
@@ -52,7 +53,7 @@
     @if (gameStarted)
     {
         <div class="game-layout">
-            <div class="game-board-container">
+            <div class="game-board-container" id="gameBoardContainer">
                 <div class="game-board">
                     <GameField dimension=@dim
                                cellLen="30"
@@ -245,10 +246,11 @@
             StateHasChanged();
         });
 
-        hubConnection.On<FiveInRowMultiplayer>("GameMove", g =>
+        hubConnection.On<FiveInRowMultiplayer>("GameMove", async g =>
         {
             game = g;
             StateHasChanged();
+            await ScrollToLastMove();
         });
 
         await hubConnection.StartAsync();
@@ -283,6 +285,15 @@
         if (game.Game.Winner == null && game.GetMover(p) == game.Game.NextMover)
         {
             await hubConnection.SendAsync("Move", game.Id, p.Id, x, y);
+        }
+    }
+
+    private async Task ScrollToLastMove()
+    {
+        if (game.Game.Moves.Any())
+        {
+            var lastMove = game.Game.Moves.Last();
+            await JSRuntime.InvokeVoidAsync("scrollToLastMove", "gameBoardContainer", lastMove.X + dim / 2, lastMove.Y + dim / 2, dim);
         }
     }
 
