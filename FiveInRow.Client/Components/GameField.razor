@@ -1,6 +1,10 @@
 ﻿<svg width=@(size + 4) height=@(size + 4) onmouseover=@onMouseOver onclick=@onClick>
     <style>
-        svg {cursor: @cursor();}
+        svg {
+            cursor: @cursor();
+            background-color: @(CanMove() ? "#FCFFEC" : "#E3E3E3")
+        }
+        
     </style>
 @for (int i = 0; i <= dimension; i++)
 {
@@ -20,6 +24,30 @@
         var downLeft = $"{xH * cellLen + 1}, {(yH + 1) * cellLen - 1}";
         <polygon points="@upperLeft @upperRight @downRight @downLeft" fill="yellow"></polygon>
     }
+
+    <!-- Background X's or O's -->
+    @if (allowedMovers.Count == 1)
+    {
+        @for (int i = - dimension / 2; i < dimension / 2; i++)
+        {
+            @for (int j = -dimension / 2; j < dimension / 2; j++)
+            {
+                if (i % 2 == 0 && j % 2 == 0){
+                    int x = (i + centerCell.x) * cellLen + cellLen / 2;
+                    int y = (j + centerCell.y) * cellLen + cellLen / 2;
+                    if (allowedMovers[0] == Mover.X)
+                        {
+                            <XDraw x="x" y="y" size=@(cellLen * 2 - 6) opacity="0.05"/>
+                        }
+                        else
+                        {
+                            <ODraw x="x" y="y" size=@(cellLen * 2 - 6) opacity="0.05" />
+                        }
+                }
+            }
+        }
+    }
+
     <!--Draw a game-->
     @foreach (var m in game.Moves)
     {
@@ -56,6 +84,11 @@
     int xH = -1;
     int yH = -1;
     (int x, int y) centerCell = (0, 0);
+
+    private bool CanMove()
+    {
+        return allowedMovers.Contains(game.NextMover);
+    }
 
     private string cursor()
     {
