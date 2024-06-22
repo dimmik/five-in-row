@@ -3,64 +3,207 @@
 @using Microsoft.AspNetCore.SignalR.Client
 @using System.Runtime.InteropServices
 @inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
 @implements IAsyncDisposable
 
 @rendermode InteractiveWebAssembly
-<div style="display: flex; flex-direction: column; align-items: center;">
-<h3>Five In a Row @(game.GetMover(p))</h3>
-<span style="display: flex; justify-content: center">
+
+<div class="game-container">
+    <h1 class="game-title">Five In a Row @(game.GetMover(p))</h1>
+    <div class="game-status">
+        @if (!gameStarted)
+        {
+            <span>Waiting for players...</span>
+        }
+        else if (game.Game.Winner != null)
+        {
+            <span class="winner-announcement">@game.Game.Winner won!!!</span>
+        }
+        else
+        {
+            <span>Current turn: @game.GetMover(p)</span>
+        }
+    </div>
+
+    <div class="game-actions">
         @if (string.IsNullOrWhiteSpace(gameToAccept))
         {
-            <button @onclick=@(() => CreateGame())>Create Game</button>
+            <button class="btn btn-primary" @onclick=@(() => CreateGame())>Create Game</button>
             @if (newGameCreated)
             {
-                <a href="/play/@(game.Id)">link to accept</a>
+                <div class="game-link">
+                    <span>Share this link to play:</span>
+                    <a href="/play/@(game.Id)">@NavigationManager.BaseUri/play/@(game.Id)</a>
+                </div>
             }
-        } else
-        {
-            if (!gameAccepted)
-            {
-                <button @onclick=@(() => AcceptGame())>Accept Game</button>
-            } else
-            {
-                <span>Game Accepted</span>
-            }
-
         }
-
-        @if (gameStarted)
+        else
         {
-            <table><tr><td>
-            <GameField 
-               dimension=@dim 
-                cellLen="20" 
-                game=@game.Game
-                onFieldClick=@onClick
-                allowedMovers=@alloweMovers()
-            />
-            </td><td>
-                Moves:
-                <ol>
+            @if (!gameAccepted)
+            {
+                <button class="btn btn-success" @onclick=@(() => AcceptGame())>Accept Game</button>
+            }
+            else
+            {
+                <span class="game-accepted">Game Accepted</span>
+            }
+        }
+    </div>
+
+    @if (gameStarted)
+    {
+        <div class="game-layout">
+            <div class="game-board-container" id="gameBoardContainer">
+                <div class="game-board">
+                    <GameField dimension=@dim
+                               cellLen="30"
+                               game=@game.Game
+                               onFieldClick=@onClick
+                               allowedMovers=@alloweMovers() />
+                </div>
+            </div>
+            <div class="game-info">
+                <h3>Moves History</h3>
+                <ol class="moves-list">
                     @foreach (var m in game.Game.Moves)
                     {
-                        <li>@m.Mover: @m.X @m.Y</li>
+                        <li>
+                            <span class="move-player">@m.Mover:</span>
+                            <span class="move-coords">(@m.X, @m.Y)</span>
+                        </li>
                     }
                 </ol>
-                    </td>
-                </tr>
-            </table>
-        }
-        <span>
-    </span>
-</span>
-@if(game.Game.Winner != null)
-{
-    <div>@game.Game.Winner won!!! <button @onclick=@ResetGame>Refresh</button></div>
-}
+            </div>
+        </div>
+    }
+
+    @if (game.Game.Winner != null)
+    {
+        <div class="game-over">
+            <button class="btn btn-primary" @onclick=@ResetGame>Play Again</button>
+        </div>
+    }
 </div>
 
-@code {
+<style>
+    .game-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        font-family: Arial, sans-serif;
+    }
 
+    .game-title {
+        text-align: center;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    .game-status {
+        text-align: center;
+        font-size: 1.2em;
+        margin-bottom: 20px;
+        padding: 10px;
+        background-color: #f0f0f0;
+        border-radius: 5px;
+    }
+
+    .winner-announcement {
+        font-weight: bold;
+        color: #4CAF50;
+    }
+
+    .game-actions {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        font-size: 1em;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        color: white;
+    }
+
+    .btn-success {
+        background-color: #28a745;
+        color: white;
+    }
+
+    .btn:hover {
+        opacity: 0.9;
+    }
+
+    .game-link {
+        margin-top: 10px;
+        text-align: center;
+    }
+
+    .game-accepted {
+        color: #28a745;
+        font-weight: bold;
+    }
+
+    .game-layout {
+        display: flex;
+        gap: 20px;
+    }
+
+    .game-board-container {
+        flex: 1;
+        overflow: auto;
+        max-height: 500px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    .game-board {
+        min-width: 100%;
+        min-height: 100%;
+    }
+
+    .game-info {
+        flex: 0 0 200px;
+        background-color: #f9f9f9;
+        padding: 15px;
+        border-radius: 5px;
+        max-height: 500px;
+        overflow-y: auto;
+    }
+
+    .moves-list {
+        padding-left: 20px;
+    }
+
+        .moves-list li {
+            margin-bottom: 5px;
+        }
+
+    .move-player {
+        font-weight: bold;
+        margin-right: 5px;
+    }
+
+    .move-coords {
+        color: #666;
+    }
+
+    .game-over {
+        text-align: center;
+        margin-top: 20px;
+    }
+</style>
+
+@code {
     private HubConnection hubConnection;
 
     public int dim = 30;
@@ -79,9 +222,9 @@
     {
         await initHub();
     }
+
     private async Task initHub()
     {
-        // awoid server-side trying to connect to hub
         if (RuntimeInformation.ProcessArchitecture != Architecture.Wasm) return;
 
         hubConnection = new HubConnectionBuilder()
@@ -103,10 +246,11 @@
             StateHasChanged();
         });
 
-        hubConnection.On<FiveInRowMultiplayer>("GameMove", g =>
+        hubConnection.On<FiveInRowMultiplayer>("GameMove", async g =>
         {
             game = g;
             StateHasChanged();
+            await ScrollToLastMove();
         });
 
         await hubConnection.StartAsync();
@@ -114,8 +258,7 @@
 
     private List<Mover> alloweMovers()
     {
-        if (!game.Game.IsActive()) // no allowed movers
-            return new();
+        if (!game.Game.IsActive()) return new();
         var m = game.GetMover(p);
         if (m != null)
             return new() { m.Value };
@@ -127,7 +270,6 @@
         await hubConnection.SendAsync("CreateGame", p.Id, Mover.O);
     }
 
-
     private async Task AcceptGame()
     {
         await hubConnection.SendAsync("AcceptGame", gameToAccept, p.Id);
@@ -138,15 +280,23 @@
         await hubConnection.SendAsync("Reset", game.Id);
     }
 
-
     private async Task onClick(int x, int y)
     {
         if (game.Game.Winner == null && game.GetMover(p) == game.Game.NextMover)
         {
             await hubConnection.SendAsync("Move", game.Id, p.Id, x, y);
         }
-
     }
+
+    private async Task ScrollToLastMove()
+    {
+        if (game.Game.Moves.Any())
+        {
+            var lastMove = game.Game.Moves.Last();
+            await JSRuntime.InvokeVoidAsync("scrollToLastMove", "gameBoardContainer", lastMove.X + dim / 2, lastMove.Y + dim / 2, dim);
+        }
+    }
+
     public async ValueTask DisposeAsync()
     {
         if (hubConnection is not null)
@@ -154,5 +304,4 @@
             await hubConnection.DisposeAsync();
         }
     }
-
 }

@@ -8,6 +8,34 @@
     <link rel="stylesheet" href="bootstrap/bootstrap.min.css" />
     <link rel="stylesheet" href="app.css" />
     <link rel="icon" type="image/png" href="favicon.png" />
+
+    <script>
+        window.scrollToLastMove = (containerId, x, y, dimension) => {
+            const container = document.getElementById(containerId);
+            if (container) {
+                const cellSize = 30; // Это должно соответствовать значению cellLen в компоненте GameField
+                const scrollX = x * cellSize;
+                const scrollY = y * cellSize;
+
+                const containerWidth = container.clientWidth;
+                const containerHeight = container.clientHeight;
+
+                const maxScrollX = (dimension * cellSize) - containerWidth;
+                const maxScrollY = (dimension * cellSize) - containerHeight;
+
+                const targetScrollX = Math.max(0, Math.min(scrollX - containerWidth / 2, maxScrollX));
+                const targetScrollY = Math.max(0, Math.min(scrollY - containerHeight / 2, maxScrollY));
+
+                container.scrollTo({
+                    left: targetScrollX,
+                    top: targetScrollY,
+                    behavior: 'smooth'
+                });
+            }
+        }
+    </script>
+
+
     <HeadOutlet @rendermode="@InteractiveWebAssembly" />
 </head>
 
