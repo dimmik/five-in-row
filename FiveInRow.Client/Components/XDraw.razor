@@ -1,6 +1,6 @@
 ﻿
-<line x1=@fromXl1 y1=@fromYl1 x2=@toXl1 y2=@toYl1 stroke="#FF0808" stroke-linecap="round" stroke-width="4" />
-<line x1=@fromXl2 y1=@fromYl2 x2=@toXl2 y2=@toYl2 stroke="#FF0808" stroke-linecap="round" stroke-width="4" />
+<line x1=@fromXl1 y1=@fromYl1 x2=@toXl1 y2=@toYl1 stroke="#FF0808" stroke-linecap="round" stroke-width="4" stroke-opacity=@opacity/>
+<line x1=@fromXl2 y1=@fromYl2 x2=@toXl2 y2=@toYl2 stroke="#FF0808" stroke-linecap="round" stroke-width="4" stroke-opacity=@opacity/>
 
 @code {
     [Parameter]
@@ -9,6 +9,8 @@
     public int y { get; set; } = 0;
     [Parameter]
     public int size { get; set; } = 10;
+    [Parameter]
+    public string opacity { get; set; } = "1";
 
     int fromXl1;
     int toXl1;
