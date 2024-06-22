@@ -258,12 +258,14 @@
             StateHasChanged();
         });
 
-        hubConnection.On<FiveInRowMultiplayer>("GameStarted", g =>
+        hubConnection.On<FiveInRowMultiplayer>("GameStarted", async g =>
         {
             gameAccepted = true;
             game = g;
             gameStarted = true;
             StateHasChanged();
+            await ScrollToLastMove();
+
         });
 
         hubConnection.On<FiveInRowMultiplayer>("GameMove", async g =>
