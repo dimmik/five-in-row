@@ -26,7 +26,7 @@
     }
 
     <!-- Background X's or O's -->
-    @if (allowedMovers.Count == 1)
+    @if (allowedMovers.Count == 1 && allowedMovers[0] == game.NextMover)
     {
         @for (int i = - dimension / 2; i < dimension / 2; i++)
         {
