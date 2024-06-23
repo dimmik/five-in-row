@@ -13,6 +13,12 @@ namespace FiveInRowDomain
         public FiveInRowGame Game { get; set; } = new();
         public Player? X { get; set; } = null;
         public Player? O { get; set; } = null;
+        public int GetDimension()
+        {
+            int maxX = Game.Moves.Select(x => Math.Abs(x.X)).Max() * 2;
+            int maxY = Game.Moves.Select(x => Math.Abs(x.Y)).Max() * 2;
+            return maxX > maxY ? maxX : maxY;
+        }
         public Mover? GetMover(Player p)
         {
             if (X == p) return Mover.X;
