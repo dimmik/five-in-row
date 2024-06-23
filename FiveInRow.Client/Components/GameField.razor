@@ -107,11 +107,9 @@
 
     protected override void OnParametersSet()
     {
-        if (game.Moves.Any()){
-            var maxCoord = game.Moves.Select(m => Math.Max(Math.Abs(m.X), Math.Abs(m.Y))).Max();
-            if (maxCoord > dimension / 2 + 1)
-                dimension = (maxCoord + 1) * 2;
-        }
+        //if (game.Moves.Any()){
+        //    recalcDimension();
+        //}
         init();
 
     }
@@ -127,7 +125,7 @@
         {
             var maxCoord = game.Moves.Select(m => Math.Max(Math.Abs(m.X), Math.Abs(m.Y))).Max();
             if (maxCoord >= dimension / 2 - 1){
-                dimension += 6;
+                dimension += 4;
                 init();
             }
         }
@@ -156,9 +154,10 @@
         var xcH = xC - centerCell.x;
         var ycH = yC - centerCell.y;
         onFieldClick(xcH, ycH);
-        if (xC == 0 || yC == 0 || xC == dimension - 1 || yC == dimension - 1){
-           // recalcDimension();
-        }
+//        if (xC == 0 || yC == 0 || xC == dimension - 1 || yC == dimension - 1){
+ //           dimension += 4;
+  //          init();
+   //     }
         return Task.CompletedTask;
     }
 }
