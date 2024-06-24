@@ -6,11 +6,12 @@ namespace FiveInRow.Hubs
 {
     public class GameHub : Hub
     {
-        private Dictionary<string, FiveInRowMultiplayer> games = new();
+        //private Dictionary<string, FiveInRowMultiplayer> games = new();
+        private IGStorage gameStorage;
 
-        public GameHub(GStorage storage) 
+        public GameHub(IGStorage storage) 
         {
-            games = storage.games;
+            gameStorage = storage;
         }
 
         public async Task CreateGame(string userId, Mover mover)
@@ -23,7 +24,7 @@ namespace FiveInRow.Hubs
             {
                 game.O = new Player(userId);
             }
-            games[game.Id] = game;
+            gameStorage.StoreGame(game.Id, game);
             await Groups.AddToGroupAsync(Context.ConnectionId, game.Id);
 
             await Clients.Group(game.Id).SendAsync("GameCreated", game);
@@ -31,12 +32,13 @@ namespace FiveInRow.Hubs
 
         public async Task AcceptGame(string gameId, string userId)
         {
-            if (!games.ContainsKey(gameId))
+            var game = gameStorage.LoadGame(gameId);
+            if (game == null)
             {
                 await Clients.Caller.SendAsync("WrongGameId", gameId);
                 return;
             }
-            var game = games[gameId];
+            
             if (game.X != null && game.O != null)
             {
                 // already accepted
@@ -57,12 +59,12 @@ namespace FiveInRow.Hubs
 
         public async Task Move(string gameId, string userId, int x, int y)
         {
-            if (!games.ContainsKey(gameId))
+            var game = gameStorage.LoadGame(gameId);
+            if (game == null)
             {
                 await Clients.Caller.SendAsync("WrongGameId", gameId, "move");
                 return;
             }
-            var game = games[gameId];
             string err = game.AddMove(new Player(userId), x, y);
             if (err == "")
             {
@@ -75,12 +77,12 @@ namespace FiveInRow.Hubs
         }
         public async Task Reset(string gameId)
         {
-            if (!games.ContainsKey(gameId))
+            var game = gameStorage.LoadGame(gameId);
+            if (game == null)
             {
                 await Clients.Caller.SendAsync("WrongGameId", gameId, "reset");
                 return;
             }
-            var game = games[gameId];
             if (game.Game.IsActive())
             {
                 await Clients.Caller.SendAsync("CannotReset", "game is in progress");
@@ -94,8 +96,33 @@ namespace FiveInRow.Hubs
             await Clients.Group(gameId).SendAsync("GameStarted", game);
         }
     }
-    public class GStorage
+    public interface IGStorage
     {
-        public Dictionary<string, FiveInRowMultiplayer> games = new();
+        public FiveInRowMultiplayer? LoadGame(string gameId);
+        public bool StoreGame(string gameId, FiveInRowMultiplayer game);
+    }
+    public class InMemoryGStorage : IGStorage
+    {
+
+        private Dictionary<string, FiveInRowMultiplayer> games = new();
+
+        public FiveInRowMultiplayer? LoadGame(string gameId)
+        {
+            if (games.ContainsKey(gameId))
+            {
+                var gm = games[gameId];
+                return gm;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public bool StoreGame(string gameId, FiveInRowMultiplayer game)
+        {
+            games[gameId] = game;
+            return true;
+        }
     }
 }

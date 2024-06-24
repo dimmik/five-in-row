@@ -56,7 +56,7 @@
             <div class="game-board-container" id="gameBoardContainer">
                 <div class="game-board">
                     <GameField 
-                        dimension=@dim 
+                        dimension=@actualDim
                         cellLen="30" 
                         game=@game.Game
                         onFieldClick=@onClick
@@ -233,7 +233,8 @@
 @code {
     private HubConnection hubConnection;
 
-    public int dim = 30;
+    public int minDim = 30;
+    private int actualDim = 30;
     public FiveInRowMultiplayer game = new();
 
     [Parameter]
@@ -261,6 +262,8 @@
         hubConnection.On<FiveInRowMultiplayer>("GameCreated", (g) =>
         {
             game = g;
+            actualDim = game.GetDimension() + 2;
+            if (actualDim < minDim) actualDim = minDim;
             newGameCreated = true;
             StateHasChanged();
         });
@@ -269,6 +272,8 @@
         {
             gameAccepted = true;
             game = g;
+            actualDim = game.GetDimension() + 2;
+            if (actualDim < minDim) actualDim = minDim;
             gameStarted = true;
             StateHasChanged();
             await ScrollToLastMove();
@@ -278,6 +283,8 @@
         hubConnection.On<FiveInRowMultiplayer>("GameMove", async g =>
         {
             game = g;
+            actualDim = game.GetDimension() + 4;
+            if (actualDim < minDim) actualDim = minDim;
             StateHasChanged();
             await ScrollToLastMove();
         });
@@ -322,7 +329,7 @@
         if (game.Game.Moves.Any())
         {
             var lastMove = game.Game.Moves.Last();
-            await JSRuntime.InvokeVoidAsync("scrollToLastMove", "gameBoardContainer", lastMove.X + dim / 2, lastMove.Y + dim / 2, dim);
+            await JSRuntime.InvokeVoidAsync("scrollToLastMove", "gameBoardContainer", lastMove.X + actualDim / 2, lastMove.Y + actualDim / 2, actualDim);
         }
     }
 

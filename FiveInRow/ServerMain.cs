@@ -21,7 +21,7 @@ namespace FiveInRow
 
             });
             // SignalR
-            builder.Services.AddSingleton(new GStorage());
+            builder.Services.AddSingleton<IGStorage>(new InMemoryGStorage());
             builder.Services.AddSignalR();
 
 
