@@ -10,7 +10,7 @@ namespace FiveInRowDomain
     {
         public IList<Move> Moves { get;  set; } = new List<Move>();
         public Mover NextMover { get;  set; } = Mover.X;
-        private Dictionary<(int x, int y), Mover> moveDict = new();
+        public Dictionary<string, Mover> moveDict { get; set; } = new();
 
         public Mover? Winner { get; set; } = null;
 
@@ -36,12 +36,12 @@ namespace FiveInRowDomain
 
         public bool AddMove(int x, int y)
         {
-            var occupied = moveDict.ContainsKey((x, y));//Moves.Where(m => (m.X == x) && (m.Y == y)).Any();
+            var occupied = moveDict.ContainsKey($"x={x}y={y}");//Moves.Where(m => (m.X == x) && (m.Y == y)).Any();
             if (occupied) return false;
             var mover = NextMover;
             var move = new Move() { X = x, Y = y, Mover = mover };
             Moves.Add(move);
-            moveDict[(x, y)] = mover;
+            moveDict[$"x={x}y={y}"] = mover;
             NextMover = NextMover == Mover.X ? Mover.O : Mover.X;
             return true;
         }
@@ -91,7 +91,7 @@ namespace FiveInRowDomain
             int y = startY + deltaY;
 
 //            while (Moves.Any(m => m.X == x && m.Y == y && m.Mover == mover))
-            while (moveDict.ContainsKey((x, y)) && moveDict[(x, y)] == mover)
+            while (moveDict.ContainsKey($"x={x}y={y}") && moveDict[$"x={x}y={y}"] == mover)
             {
                 count++;
                 x += deltaX;

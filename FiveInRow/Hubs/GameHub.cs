@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using FiveInRow.Storage;
 using FiveInRowDomain;
 using Microsoft.AspNetCore.SignalR;
 
@@ -53,6 +54,8 @@ namespace FiveInRow.Hubs
             {
                 game.O = new Player(userId);
             }
+            gameStorage.StoreGame(gameId, game);
+
             await Groups.AddToGroupAsync(Context.ConnectionId, game.Id);
             await Clients.Group(game.Id).SendAsync("GameStarted", game);
         }
@@ -69,6 +72,7 @@ namespace FiveInRow.Hubs
             if (err == "")
             {
                 _ = game.Game.WhoWon();
+                gameStorage.StoreGame(gameId, game);
                 await Clients.Group(game.Id).SendAsync("GameMove", game);
             } else
             {
@@ -92,37 +96,9 @@ namespace FiveInRow.Hubs
             var pTmp = game.X;
             game.X = game.O;
             game.O = pTmp;
+            gameStorage.StoreGame(gameId, game);
 
             await Clients.Group(gameId).SendAsync("GameStarted", game);
-        }
-    }
-    public interface IGStorage
-    {
-        public FiveInRowMultiplayer? LoadGame(string gameId);
-        public bool StoreGame(string gameId, FiveInRowMultiplayer game);
-    }
-    public class InMemoryGStorage : IGStorage
-    {
-
-        private Dictionary<string, FiveInRowMultiplayer> games = new();
-
-        public FiveInRowMultiplayer? LoadGame(string gameId)
-        {
-            if (games.ContainsKey(gameId))
-            {
-                var gm = games[gameId];
-                return gm;
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        public bool StoreGame(string gameId, FiveInRowMultiplayer game)
-        {
-            games[gameId] = game;
-            return true;
         }
     }
 }

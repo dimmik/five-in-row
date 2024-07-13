@@ -1,6 +1,7 @@
 using FiveInRow.Client.Pages;
 using FiveInRow.Components;
 using FiveInRow.Hubs;
+using FiveInRow.Storage;
 
 namespace FiveInRow
 {
@@ -20,8 +21,20 @@ namespace FiveInRow
                 options.Cookie.Expiration = TimeSpan.Zero;
 
             });
+            var storageType = builder.Configuration.GetValue<string>("Storage");
+            if (string.Equals(storageType, "mongo", StringComparison.OrdinalIgnoreCase))
+            {
+                var srv = builder.Configuration.GetValue<string>("MongoSrv") ?? "_none";
+                var login = builder.Configuration.GetValue<string>("MongoLogin") ?? "_none";
+                var pwd = builder.Configuration.GetValue<string>("MongoPwd") ?? "_none";
+                var sp = new MongoGStorage(srv, login, pwd);
+                builder.Services.AddSingleton<IGStorage>(sp);
+            }
+            else // Default to in-memory storage
+            {
+                builder.Services.AddSingleton<IGStorage>(new InMemoryGStorage());
+            }
             // SignalR
-            builder.Services.AddSingleton<IGStorage>(new InMemoryGStorage());
             builder.Services.AddSignalR();
 
 
