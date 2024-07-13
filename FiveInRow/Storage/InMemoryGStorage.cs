@@ -25,5 +25,10 @@ namespace FiveInRow.Storage
             games[gameId] = game;
             return true;
         }
+
+        public string WhoAmI()
+        {
+            return "In Memory Storage";
+        }
     }
 }

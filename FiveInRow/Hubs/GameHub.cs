@@ -9,10 +9,19 @@ namespace FiveInRow.Hubs
     {
         //private Dictionary<string, FiveInRowMultiplayer> games = new();
         private IGStorage gameStorage;
+        private ILogger logger;
 
-        public GameHub(IGStorage storage) 
+        private static bool firstInstantiate = true;
+
+        public GameHub(IGStorage storage, ILogger<GameHub> log) 
         {
             gameStorage = storage;
+            logger = log;
+            if (firstInstantiate)
+            {
+                logger.LogInformation($"storage: {gameStorage.WhoAmI()}");
+                firstInstantiate = false;
+            }
         }
 
         public async Task CreateGame(string userId, Mover mover)

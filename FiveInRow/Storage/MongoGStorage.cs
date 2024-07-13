@@ -49,4 +49,9 @@ public class MongoGStorage : IGStorage
             return false;
         }
     }
+
+    public string WhoAmI()
+    {
+        return $"Mongo DB Storage";
+    }
 }

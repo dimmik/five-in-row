@@ -6,5 +6,6 @@ namespace FiveInRow.Storage
     {
         public FiveInRowMultiplayer? LoadGame(string gameId);
         public bool StoreGame(string gameId, FiveInRowMultiplayer game);
+        public string WhoAmI();
     }
 }
