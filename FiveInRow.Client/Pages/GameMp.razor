@@ -303,7 +303,7 @@
 
     private async Task CreateGame()
     {
-        await hubConnection.SendAsync("CreateGame", p.Id, Mover.O);
+        await hubConnection.SendAsync("CreateGame", p.Id, Mover.X);
     }
 
     private async Task AcceptGame()
