@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace FiveInRowDomain
+﻿namespace FiveInRowDomain
 {
     public class FiveInRowGame
     {
         public IList<Move> Moves { get;  set; } = new List<Move>();
         public Mover NextMover { get;  set; } = Mover.X;
-        public Dictionary<string, Mover> moveDict { get; set; } = new();
+        private Dictionary<string, Mover> moveDict = new();
 
         public Mover? Winner { get; set; } = null;
 
@@ -23,7 +17,6 @@ namespace FiveInRowDomain
         private void init()
         {
             Winner = null;
-            moveDict.Clear();
             Moves = new List<Move>();
             NextMover = Mover.X;
             AddMove(0, 0);
@@ -41,7 +34,6 @@ namespace FiveInRowDomain
             var mover = NextMover;
             var move = new Move() { X = x, Y = y, Mover = mover };
             Moves.Add(move);
-            moveDict[$"x={x}y={y}"] = mover;
             NextMover = NextMover == Mover.X ? Mover.O : Mover.X;
             return true;
         }
@@ -57,6 +49,7 @@ namespace FiveInRowDomain
 
         public Mover? CalculateWinner()
         {
+            InitMovesDict();
             foreach (var move in Moves)
             {
                 if (CheckDirection(move, 1, 0) || // горизонталь
@@ -68,6 +61,15 @@ namespace FiveInRowDomain
                 }
             }
             return null;
+        }
+
+        private void InitMovesDict()
+        {
+            moveDict.Clear();
+            foreach (var m in Moves)
+            {
+                moveDict[$"x={m.X}y={m.Y}"] = m.Mover;
+            }
         }
 
         private bool CheckDirection(Move startMove, int deltaX, int deltaY)
