@@ -10,6 +10,9 @@ namespace FiveInRowDomain
     {
         public string Id { get; set; } = Guid.NewGuid().ToString();
 
+        public string Name { get; set; } = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss}";
+        public DateTimeOffset StartTime { get; set; } = DateTimeOffset.Now;
+
         public FiveInRowGame Game { get; set; } = new();
         public Player? X { get; set; } = null;
         public Player? O { get; set; } = null;
@@ -45,45 +48,6 @@ namespace FiveInRowDomain
             Game.AddMove(x, y);
             return "";
 
-        }
-    }
-    public class Player : IEquatable<Player?>
-    {
-        public string Id { get; set; } = Guid.NewGuid().ToString();
-
-        public Player(string id)
-        {
-            Id = id ?? throw new ArgumentNullException(nameof(id));
-        }
-        public Player()
-        {
-            // nothing - id is random Guid
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return Equals(obj as Player);
-        }
-
-        public bool Equals(Player? other)
-        {
-            return other is not null &&
-                   Id == other.Id;
-        }
-
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(Id);
-        }
-
-        public static bool operator ==(Player? left, Player? right)
-        {
-            return EqualityComparer<Player>.Default.Equals(left, right);
-        }
-
-        public static bool operator !=(Player? left, Player? right)
-        {
-            return !(left == right);
         }
     }
 }
