@@ -4,7 +4,7 @@
     {
         public IList<Move> Moves { get;  set; } = new List<Move>();
         public Mover NextMover { get;  set; } = Mover.X;
-        private Dictionary<string, Mover> moveDict = new();
+        //private Dictionary<string, Mover> moveDict = new();
 
         public Mover? Winner { get; set; } = null;
 
@@ -12,24 +12,22 @@
 
         public FiveInRowGame()
         {
-            init();
-        }
-        private void init()
-        {
-            Winner = null;
-            Moves = new List<Move>();
-            NextMover = Mover.X;
-            AddMove(0, 0);
+            //init();
         }
 
         public void Reset()
         {
-            init();
+            Winner = null;
+            Moves.Clear();
+            NextMover = Mover.X;
+            AddMove(0, 0);
         }
 
         public bool AddMove(int x, int y)
         {
-            var occupied = moveDict.ContainsKey($"x={x}y={y}");//Moves.Where(m => (m.X == x) && (m.Y == y)).Any();
+            //var moveDict = InitMovesDict();
+//            var occupied = moveDict.ContainsKey($"x={x}y={y}");//Moves.Where(m => (m.X == x) && (m.Y == y)).Any();
+            var occupied = Moves.Where(m => (m.X == x) && (m.Y == y)).Any();
             if (occupied) return false;
             var mover = NextMover;
             var move = new Move() { X = x, Y = y, Mover = mover };
@@ -49,13 +47,13 @@
 
         public Mover? CalculateWinner()
         {
-            InitMovesDict();
+            var moveDicst = InitMovesDict();
             foreach (var move in Moves)
             {
-                if (CheckDirection(move, 1, 0) || // горизонталь
-                    CheckDirection(move, 0, 1) || // вертикаль
-                    CheckDirection(move, 1, 1) || // диагональ вниз
-                    CheckDirection(move, 1, -1))  // диагональ вверх
+                if (CheckDirection(move, 1, 0, moveDicst) || // горизонталь
+                    CheckDirection(move, 0, 1, moveDicst) || // вертикаль
+                    CheckDirection(move, 1, 1, moveDicst) || // диагональ вниз
+                    CheckDirection(move, 1, -1, moveDicst))  // диагональ вверх
                 {
                     return move.Mover;
                 }
@@ -63,30 +61,31 @@
             return null;
         }
 
-        private void InitMovesDict()
+        private Dictionary<string, Mover> InitMovesDict()
         {
-            moveDict.Clear();
+            Dictionary<string, Mover> moveDict = new();
             foreach (var m in Moves)
             {
                 moveDict[$"x={m.X}y={m.Y}"] = m.Mover;
             }
+            return moveDict;
         }
 
-        private bool CheckDirection(Move startMove, int deltaX, int deltaY)
+        private bool CheckDirection(Move startMove, int deltaX, int deltaY, Dictionary<string, Mover> moveDict)
         {
             int count = 1;
             int x = startMove.X;
             int y = startMove.Y;
 
             // Проверяем в одну сторону
-            count += CountInDirection(x, y, deltaX, deltaY, startMove.Mover);
+            count += CountInDirection(x, y, deltaX, deltaY, startMove.Mover, moveDict);
             // Проверяем в другую сторону
-            count += CountInDirection(x, y, -deltaX, -deltaY, startMove.Mover);
+            count += CountInDirection(x, y, -deltaX, -deltaY, startMove.Mover, moveDict);
 
             return count >= 5;
         }
 
-        private int CountInDirection(int startX, int startY, int deltaX, int deltaY, Mover mover)
+        private int CountInDirection(int startX, int startY, int deltaX, int deltaY, Mover mover, Dictionary<string, Mover> moveDict)
         {
             int count = 0;
             int x = startX + deltaX;

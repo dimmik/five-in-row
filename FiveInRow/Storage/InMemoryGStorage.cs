@@ -1,18 +1,20 @@
 ﻿using FiveInRowDomain;
+using Newtonsoft.Json;
 
 namespace FiveInRow.Storage
 {
     public class InMemoryGStorage : IGStorage
     {
 
-        private Dictionary<string, FiveInRowMultiplayer> games = new();
+        private Dictionary<string, string> games = new();
 
         public FiveInRowMultiplayer? LoadGame(string gameId)
         {
             if (games.ContainsKey(gameId))
             {
                 var gm = games[gameId];
-                return gm;
+                FiveInRowMultiplayer? g = JsonConvert.DeserializeObject<FiveInRowMultiplayer>(gm);
+                return g;
             }
             else
             {
@@ -22,7 +24,8 @@ namespace FiveInRow.Storage
 
         public bool StoreGame(string gameId, FiveInRowMultiplayer game)
         {
-            games[gameId] = game;
+            var j = JsonConvert.SerializeObject(game);
+            games[gameId] = j;
             return true;
         }
 

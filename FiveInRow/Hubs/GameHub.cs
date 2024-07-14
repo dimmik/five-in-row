@@ -30,9 +30,12 @@ namespace FiveInRow.Hubs
             if (mover == Mover.X)
             {
                 game.X = new Player(userId);
-            } else
+                game.AddMove(game.X, 0, 0);
+            }
+            else
             {
                 game.O = new Player(userId);
+                game.AddMove(game.O, 0, 0);
             }
             gameStorage.StoreGame(game.Id, game);
             await Groups.AddToGroupAsync(Context.ConnectionId, game.Id);
@@ -96,7 +99,7 @@ namespace FiveInRow.Hubs
                 await Clients.Caller.SendAsync("WrongGameId", gameId, "reset");
                 return;
             }
-            if (game.Game.IsActive())
+            if (game.Game.WhoWon() == null)
             {
                 await Clients.Caller.SendAsync("CannotReset", "game is in progress");
                 return;
